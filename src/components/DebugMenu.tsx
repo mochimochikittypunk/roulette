@@ -22,7 +22,6 @@ export const DebugMenu = () => {
                             className="bg-slate-800 text-white p-4 rounded-lg shadow-xl mb-2 border border-slate-700"
                         >
                             <div className="flex items-center gap-4">
-                                <span className="text-sm font-bold whitespace-nowrap">デモモード</span>
                                 <button
                                     onClick={toggleDebugMode}
                                     className={`w-14 h-7 rounded-full p-1 transition-colors ${isDebugMode ? 'bg-cyan-500' : 'bg-slate-600'
@@ -45,16 +44,6 @@ export const DebugMenu = () => {
                     <Settings size={20} className="text-slate-400" />
                 </button>
             </div>
-
-            {/* Demo Mode Indicator */}
-            {isDebugMode && (
-                <div className="fixed top-4 right-4 z-50">
-                    <div className="flex items-center gap-2 bg-cyan-500 text-slate-900 px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                        <div className="w-2 h-2 bg-slate-900 rounded-full animate-pulse" />
-                        DEMO
-                    </div>
-                </div>
-            )}
         </>
     );
 };
