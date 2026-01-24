@@ -1,15 +1,20 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { LotteryItem, useLottery } from '@/hooks/useLottery';
+import { LotteryItem, useLottery, LotteryItemType, LOTTERY_ITEMS } from '@/hooks/useLottery';
 
 type GameStatus = 'IDLE' | 'SPINNING' | 'STOPPING' | 'RESULT';
 
 interface GameContextType {
     isDebugMode: boolean;
+    debugTarget: LotteryItemType | null;
     status: GameStatus;
     result: LotteryItem | null;
+    isAuthenticated: boolean;
+    isVerifying: boolean;
     toggleDebugMode: () => void;
+    setDebugTarget: (target: LotteryItemType | null) => void;
+    login: (orderNumber: string) => Promise<{ success: boolean; message?: string }>;
     startGame: () => void;
     stopGame: () => void;
     finishGame: () => void;
@@ -20,12 +25,40 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
     const [isDebugMode, setIsDebugMode] = useState(false);
+    const [debugTarget, setDebugTarget] = useState<LotteryItemType | null>(null);
     const [status, setStatus] = useState<GameStatus>('IDLE');
     const [result, setResult] = useState<LotteryItem | null>(null);
+
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
 
     const { draw } = useLottery(isDebugMode);
 
     const toggleDebugMode = () => setIsDebugMode(prev => !prev);
+
+    const login = async (orderNumber: string): Promise<{ success: boolean; message?: string }> => {
+        setIsVerifying(true);
+        try {
+            const response = await fetch('/api/verify-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderNumber }),
+            });
+            const data = await response.json();
+
+            if (data.allowed) {
+                setIsAuthenticated(true);
+                return { success: true };
+            } else {
+                return { success: false, message: data.error || '認証に失敗しました' };
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            return { success: false, message: '通信エラーが発生しました' };
+        } finally {
+            setIsVerifying(false);
+        }
+    };
 
     const startGame = () => {
         if (status !== 'IDLE' && status !== 'RESULT') return;
@@ -36,7 +69,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     const stopGame = () => {
         if (status !== 'SPINNING') return;
 
-        const drawResult = draw();
+        let drawResult: LotteryItem;
+
+        if (isDebugMode && debugTarget) {
+            drawResult = LOTTERY_ITEMS[debugTarget];
+        } else {
+            drawResult = draw();
+        }
+
         setResult(drawResult);
         setStatus('STOPPING');
         // The visual component will detect 'STOPPING' and trigger 'RESULT' after animation
@@ -54,9 +94,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     return (
         <GameContext.Provider value={{
             isDebugMode,
+            debugTarget,
             status,
             result,
+            isAuthenticated,
+            isVerifying,
             toggleDebugMode,
+            setDebugTarget,
+            login,
             startGame,
             stopGame,
             finishGame,

@@ -24,12 +24,14 @@ async function verify() {
     console.log("Normal Mode Results (10000 runs):");
     console.table(results);
 
+    // FULL now has 0.01% probability, so it may appear.
+    // We just log the results.
     if (results['FULL']) {
-        console.error("CRITICAL FAILURE: FULL Cashback appeared in Normal Mode!");
-        process.exit(1);
+        console.log(`NOTICE: FULL Cashback appeared ${results['FULL']} times (Expected ~1 time).`);
     } else {
-        console.log("PASS: FULL Cashback did not appear in Normal Mode.");
+        console.log("NOTICE: FULL Cashback did not appear (Expected behavior for low probability).");
     }
+    console.log("PASS: Completed Normal Mode runs.");
 
     // 2. Verify Debug Mode
     const DEBUG_ITERATIONS = 100;

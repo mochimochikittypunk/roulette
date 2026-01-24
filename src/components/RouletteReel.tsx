@@ -10,10 +10,8 @@ import { Confetti } from './Confetti';
 const BASE_SEQUENCE = [
     LOTTERY_ITEMS.FULL,
     LOTTERY_ITEMS.LOSE,
-    LOTTERY_ITEMS.RETRY,
+    LOTTERY_ITEMS.GEISHA,
     LOTTERY_ITEMS['100'],
-    LOTTERY_ITEMS['300'],
-    LOTTERY_ITEMS.HALF,
 ];
 
 const ITEM_HEIGHT = 120;
@@ -54,79 +52,41 @@ export const RouletteReel = () => {
                     ease: [0.1, 0.8, 0.2, 1],
                 }
             }).then(() => {
-                finishGame();
-                // Show confetti for cashback wins
-                if (result.type === 'FULL' || result.type === 'HALF' || result.type === '300' || result.type === '100') {
-                    setShowConfetti(true);
-                }
+                // Add a small delay so the user sees where it stopped before valid "screen transition" feeling
+                setTimeout(() => {
+                    finishGame();
+                }, 1500);
             });
         } else if (status === 'IDLE') {
             controls.set({ y: 0 });
-            setShowConfetti(false);
         }
     }, [status, result, controls, finishGame]);
 
-    const isFullCashback = result?.type === 'FULL';
-
     return (
-        <>
-            <div
-                ref={containerRef}
-                className="relative w-full h-[400px] overflow-hidden"
+        <div
+            ref={containerRef}
+            className="relative w-full h-[400px] overflow-hidden"
+        >
+            {/* Scrolling items */}
+            <motion.div
+                animate={controls}
+                className="absolute top-0 left-0 right-0"
             >
-                {/* Scrolling items - hide when showing result */}
-                <motion.div
-                    animate={controls}
-                    className="absolute top-0 left-0 right-0"
-                    style={{ opacity: status === 'RESULT' ? 0.3 : 1 }}
-                >
-                    {items.map((item, index) => (
-                        <div
-                            key={index}
-                            className="flex items-center justify-center h-[120px]"
-                        >
-                            <span className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-blue-200/70 whitespace-nowrap">
-                                {item.label}
-                            </span>
-                        </div>
-                    ))}
-                </motion.div>
+                {items.map((item, index) => (
+                    <div
+                        key={index}
+                        className="flex items-center justify-center h-[120px]"
+                    >
+                        <span className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-blue-200/70 whitespace-nowrap">
+                            {item.label}
+                        </span>
+                    </div>
+                ))}
+            </motion.div>
 
-                {/* Result display - centered, one line, no wrap */}
-                <AnimatePresence>
-                    {status === 'RESULT' && result && (
-                        <motion.div
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.5, opacity: 0 }}
-                            className="absolute inset-0 flex items-center justify-center z-30"
-                        >
-                            <motion.span
-                                animate={{
-                                    scale: isFullCashback ? [1, 1.05, 1] : 1,
-                                }}
-                                transition={{
-                                    repeat: isFullCashback ? Infinity : 0,
-                                    duration: 0.8
-                                }}
-                                className={`font-black tracking-tight whitespace-nowrap ${isFullCashback
-                                        ? 'text-3xl md:text-5xl lg:text-6xl text-yellow-300 drop-shadow-[0_0_30px_rgba(253,224,71,0.8)]'
-                                        : 'text-3xl md:text-5xl lg:text-6xl text-cyan-300 drop-shadow-[0_0_20px_rgba(103,232,249,0.5)]'
-                                    }`}
-                            >
-                                {result.label}
-                            </motion.span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Gradients */}
-                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-900 to-transparent z-20 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900 to-transparent z-20 pointer-events-none" />
-            </div>
-
-            {/* Confetti overlay */}
-            {showConfetti && <Confetti isFullCashback={isFullCashback} />}
-        </>
+            {/* Gradients */}
+            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-900 to-transparent z-20 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900 to-transparent z-20 pointer-events-none" />
+        </div>
     );
 };
