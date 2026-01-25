@@ -6,9 +6,14 @@ import { useGame } from '@/contexts/GameContext';
 import { Copy, Mail, Star, Ticket } from 'lucide-react';
 
 export const ResultScreen = () => {
-    const { result } = useGame();
+    const { result, logEvent } = useGame();
 
     if (!result) return null;
+
+    const handleCopy = (code: string) => {
+        navigator.clipboard.writeText(code);
+        logEvent('CouponCopy', { coupon_code: code });
+    };
 
     // Define content based on result type
     const renderContent = () => {
@@ -79,7 +84,7 @@ export const ResultScreen = () => {
                         <p className="text-yellow-100 font-medium">次回の注文でご利用ください！</p>
 
                         <div className="bg-slate-900/80 p-6 rounded-xl border border-yellow-500/20 flex flex-col gap-2 relative group cursor-pointer"
-                            onClick={() => navigator.clipboard.writeText('KYQ4WE35')}>
+                            onClick={() => handleCopy('KYQ4WE35')}>
                             <p className="text-xs text-slate-400 uppercase tracking-widest">Coupon Code</p>
                             <div className="flex items-center justify-center gap-4">
                                 <span className="text-3xl font-mono font-bold text-white tracking-widest">KYQ4WE35</span>
@@ -111,7 +116,7 @@ export const ResultScreen = () => {
                         </p>
 
                         <div className="bg-slate-900/80 p-6 rounded-xl border border-fuchsia-500/20 flex flex-col gap-2 relative group cursor-pointer"
-                            onClick={() => navigator.clipboard.writeText('WF45SJCN')}>
+                            onClick={() => handleCopy('WF45SJCN')}>
                             <p className="text-xs text-slate-400 uppercase tracking-widest">Coupon Code</p>
                             <div className="flex items-center justify-center gap-4">
                                 <span className="text-3xl font-mono font-bold text-white tracking-widest">WF45SJCN</span>

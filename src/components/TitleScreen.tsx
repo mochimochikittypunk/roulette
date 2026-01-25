@@ -6,7 +6,7 @@ import { useGame } from '@/contexts/GameContext';
 import { Loader2 } from 'lucide-react';
 
 export const TitleScreen = () => {
-    const { login, isVerifying } = useGame();
+    const { login, isVerifying, logEvent } = useGame();
     const [orderNumber, setOrderNumber] = useState('');
     const [error, setError] = useState('');
 
@@ -18,6 +18,7 @@ export const TitleScreen = () => {
         const res = await login(orderNumber);
         if (!res.success) {
             setError(res.message || '認証に失敗しました');
+            logEvent('AuthFail', { entered_code: orderNumber, error_message: res.message });
         }
     };
 

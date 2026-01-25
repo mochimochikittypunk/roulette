@@ -15,6 +15,7 @@ interface GameContextType {
     toggleDebugMode: () => void;
     setDebugTarget: (target: LotteryItemType | null) => void;
     login: (orderNumber: string) => Promise<{ success: boolean; message?: string }>;
+    logEvent: (eventType: string, details?: any, result?: string) => Promise<void>;
     startGame: () => void;
     stopGame: () => void;
     finishGame: () => void;
@@ -82,7 +83,28 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         // The visual component will detect 'STOPPING' and trigger 'RESULT' after animation
     };
 
+    const logEvent = async (eventType: string, details: any = {}, result?: string) => {
+        try {
+            await fetch('/api/log-event', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    eventType,
+                    details,
+                    result,
+                    userAgent: navigator.userAgent
+                }),
+            });
+        } catch (error) {
+            console.error('Logging failed:', error);
+            // Non-blocking error
+        }
+    };
+
     const finishGame = () => {
+        if (result) {
+            logEvent('GameResult', { type: result.type, label: result.label }, result.label);
+        }
         setStatus('RESULT');
     };
 
@@ -102,6 +124,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             toggleDebugMode,
             setDebugTarget,
             login,
+            logEvent,
             startGame,
             stopGame,
             finishGame,
