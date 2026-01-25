@@ -41,7 +41,7 @@ export const TitleScreen = () => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2 text-left">
                             <label htmlFor="orderNumber" className="text-sm font-medium text-blue-200">
-                                注文番号を入力してください
+                                注文IDを入力してください
                             </label>
                             <input
                                 id="orderNumber"
@@ -86,7 +86,7 @@ export const TitleScreen = () => {
 
                 <p className="text-slate-500 text-sm">
                     ※ 認証に成功するとルーレットが開始されます。<br />
-                    一度認証された番号は使用済みとなります。
+                    一度認証されたIDは使用済みとなります。
                 </p>
             </motion.div>
         </div>

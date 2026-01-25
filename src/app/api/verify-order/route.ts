@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
         const { orderNumber } = await req.json();
 
         if (!orderNumber) {
-            return NextResponse.json({ allowed: false, error: '注文番号を入力してください' }, { status: 400 });
+            return NextResponse.json({ allowed: false, error: '注文IDを入力してください' }, { status: 400 });
         }
 
         // --- Configuration Check ---
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
             await targetRow.delete();
             return NextResponse.json({ allowed: true });
         } else {
-            return NextResponse.json({ allowed: false, error: '無効な注文番号です' });
+            return NextResponse.json({ allowed: false, error: '無効な注文IDです' });
         }
 
     } catch (error) {
