@@ -6,7 +6,7 @@ import { useGame } from '@/contexts/GameContext';
 import { Copy, Mail, Star, Ticket } from 'lucide-react';
 
 export const ResultScreen = () => {
-    const { result, logEvent } = useGame();
+    const { result, logEvent, remainingSpins, continueToNextSpin } = useGame();
 
     if (!result) return null;
 
@@ -169,13 +169,31 @@ export const ResultScreen = () => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-sm p-4 animate-in fade-in duration-500">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-sm p-4 animate-in fade-in duration-500 overflow-y-auto">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="w-full max-w-2xl text-center"
+                className="w-full max-w-2xl text-center my-8"
             >
                 {renderContent()}
+
+                {remainingSpins > 0 && (
+                    <div className="mt-8 animate-bounce-subtle">
+                        <button
+                            onClick={continueToNextSpin}
+                            className="w-full max-w-md mx-auto group relative px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl font-black text-xl text-white shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:shadow-[0_0_30px_rgba(16,185,129,0.8)] transition-all transform hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                            <span className="relative flex items-center justify-center gap-2">
+                                <Ticket className="w-6 h-6" />
+                                もう一回回す！
+                                <span className="bg-white/20 px-2 py-0.5 rounded text-sm">
+                                    あと {remainingSpins} 回
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                )}
             </motion.div>
         </div>
     );

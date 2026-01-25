@@ -9,6 +9,8 @@ export const DebugMenu = () => {
     const { isDebugMode, toggleDebugMode, debugTarget, setDebugTarget } = useGame();
     const [isOpen, setIsOpen] = useState(false);
 
+    if (!isDebugMode) return null;
+
     return (
         <>
             <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">

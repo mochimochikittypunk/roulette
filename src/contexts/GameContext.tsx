@@ -20,6 +20,8 @@ interface GameContextType {
     stopGame: () => void;
     finishGame: () => void;
     resetGame: () => void;
+    remainingSpins: number;
+    continueToNextSpin: () => Promise<void>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -32,12 +34,22 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
+    const [remainingSpins, setRemainingSpins] = useState(0);
+    const [currentOrderNumber, setCurrentOrderNumber] = useState('');
 
     const { draw } = useLottery(isDebugMode);
 
     const toggleDebugMode = () => setIsDebugMode(prev => !prev);
 
     const login = async (orderNumber: string): Promise<{ success: boolean; message?: string }> => {
+        // Special Debug Admin Code
+        if (orderNumber === 'debug-admin') {
+            logEvent('DebugAccess', { code: orderNumber });
+            setIsDebugMode(true);
+            setIsAuthenticated(true);
+            return { success: true };
+        }
+
         setIsVerifying(true);
         try {
             const response = await fetch('/api/verify-order', {
@@ -49,6 +61,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
             if (data.allowed) {
                 setIsAuthenticated(true);
+                setRemainingSpins(data.remaining || 0);
+                setCurrentOrderNumber(orderNumber);
                 return { success: true };
             } else {
                 return { success: false, message: data.error || '認証に失敗しました' };
@@ -58,6 +72,16 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             return { success: false, message: '通信エラーが発生しました' };
         } finally {
             setIsVerifying(false);
+        }
+    };
+
+    const continueToNextSpin = async () => {
+        if (!currentOrderNumber) return;
+
+        // Call login again to consume another ticket
+        const res = await login(currentOrderNumber);
+        if (res.success) {
+            resetGame();
         }
     };
 
@@ -128,7 +152,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             startGame,
             stopGame,
             finishGame,
-            resetGame
+            resetGame,
+            remainingSpins,
+            continueToNextSpin
         }}>
             {children}
         </GameContext.Provider>

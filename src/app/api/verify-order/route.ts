@@ -44,26 +44,22 @@ export async function POST(req: NextRequest) {
         // For simple usage ~1000 rows, `getRows` is fine.
         const rows = await sheet.getRows();
 
-        // Find row with orderNumber matching (Assuming Column A / header 'order_number' or first column)
-        // If the sheet has headers, we access by header name. 
-        // If 'orderNumber' is blindly entered into column A without header, we might assume rows[i]._rawData[0]
-
-        // Let's assume there is a header "number" or we just key off the first column value
-        // Better: iterate rows and check the first available value
-
-        const targetRow = rows.find(row => {
-            // Check formatted value of first column or key 'order_number'
-            // row.toObject() gives keyed object if headers exist.
-            // Let's assume the user puts order numbers in the first column.
+        // Find ALL rows with orderNumber matching
+        const matchingRows = rows.filter(row => {
             const values = row.toObject();
             const firstValue = Object.values(values)[0] as string;
             return firstValue === orderNumber;
         });
 
-        if (targetRow) {
-            // --- Success: Delete Row ---
+        if (matchingRows.length > 0) {
+            // --- Success: Delete ONE Row ---
+            const targetRow = matchingRows[0];
             await targetRow.delete();
-            return NextResponse.json({ allowed: true });
+
+            // Remaining count (excluding the one just deleted)
+            const remaining = matchingRows.length - 1;
+
+            return NextResponse.json({ allowed: true, remaining });
         } else {
             return NextResponse.json({ allowed: false, error: '無効な注文IDです' });
         }
