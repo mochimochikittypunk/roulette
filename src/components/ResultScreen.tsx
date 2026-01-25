@@ -25,7 +25,7 @@ export const ResultScreen = () => {
                     <div className="p-6 bg-slate-800/50 rounded-xl border border-white/5 space-y-4 text-left">
                         <p className="text-lg font-medium text-blue-200 text-center">
                             オンラインショップにレビューを投稿すると<br />
-                            もう一度ルーレットを回すことができます！
+                            さらに3回ルーレットを回すことができます！
                         </p>
                         <div className="h-px bg-white/10 w-full" />
                         <ul className="space-y-3 text-sm text-slate-400">
