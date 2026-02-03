@@ -52,16 +52,13 @@ export const ResultScreen = () => {
 
                         <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
                             <div className="flex items-center gap-2 text-cyan-200 text-sm font-bold">
-                                <Mail className="w-4 h-4" />
+                                <Ticket className="w-4 h-4" />
                                 <span>再挑戦の方法</span>
                             </div>
-                            <p className="text-slate-300 text-sm">
-                                レビュー投稿完了後、その<span className="text-white font-bold border-b border-cyan-500">スクリーンショット</span>を<br />
-                                下記アドレスまでお送りください。
+                            <p className="text-slate-300 text-sm leading-relaxed">
+                                レビュー投稿後、<span className="text-white font-bold">24時間以内</span>に3クレジット追加されるので、<br />
+                                再度同じ注文IDでチャレンジしてみてください◎
                             </p>
-                            <code className="block bg-black/40 p-3 rounded font-mono text-center select-all cursor-text text-white border border-white/10 text-sm">
-                                salvadorcoffeebar@gmail.com
-                            </code>
                         </div>
                     </div>
                 </div>
