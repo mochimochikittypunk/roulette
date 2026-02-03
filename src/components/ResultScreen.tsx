@@ -15,6 +15,44 @@ export const ResultScreen = () => {
         logEvent('CouponCopy', { coupon_code: code });
     };
 
+    // Common review prompt component
+    const ReviewPrompt = () => (
+        <div className="p-6 bg-slate-800/50 rounded-xl border border-white/5 space-y-4 text-left">
+            <p className="text-lg font-medium text-blue-200 text-center">
+                オンラインショップにレビューを投稿すると<br />
+                さらに3回ルーレットを回すことができます！
+            </p>
+            <div className="h-px bg-white/10 w-full" />
+            <ul className="space-y-3 text-sm text-slate-400">
+                <li className="flex gap-3">
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">A</span>
+                    <span>
+                        <strong>PayIDで購入した方：</strong><br />
+                        注文履歴からレビュー投稿ができます。
+                    </span>
+                </li>
+                <li className="flex gap-3">
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs">B</span>
+                    <span>
+                        <strong>ウェブから購入した方：</strong><br />
+                        発送通知メールからレビュー投稿ができます。
+                    </span>
+                </li>
+            </ul>
+
+            <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
+                <div className="flex items-center gap-2 text-cyan-200 text-sm font-bold">
+                    <Ticket className="w-4 h-4" />
+                    <span>再挑戦の方法</span>
+                </div>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                    レビュー投稿後、<span className="text-white font-bold">24時間以内</span>に3クレジット追加されるので、<br />
+                    再度同じ注文IDでチャレンジしてみてください◎
+                </p>
+            </div>
+        </div>
+    );
+
     // Define content based on result type
     const renderContent = () => {
         if (result.type === 'LOSE') {
@@ -27,40 +65,7 @@ export const ResultScreen = () => {
                         <h2 className="text-3xl font-bold text-slate-300">残念、はずれ！</h2>
                     </div>
 
-                    <div className="p-6 bg-slate-800/50 rounded-xl border border-white/5 space-y-4 text-left">
-                        <p className="text-lg font-medium text-blue-200 text-center">
-                            オンラインショップにレビューを投稿すると<br />
-                            さらに3回ルーレットを回すことができます！
-                        </p>
-                        <div className="h-px bg-white/10 w-full" />
-                        <ul className="space-y-3 text-sm text-slate-400">
-                            <li className="flex gap-3">
-                                <span className="shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">A</span>
-                                <span>
-                                    <strong>PayIDで購入した方：</strong><br />
-                                    注文履歴からレビュー投稿ができます。
-                                </span>
-                            </li>
-                            <li className="flex gap-3">
-                                <span className="shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs">B</span>
-                                <span>
-                                    <strong>ウェブから購入した方：</strong><br />
-                                    発送通知メールからレビュー投稿ができます。
-                                </span>
-                            </li>
-                        </ul>
-
-                        <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
-                            <div className="flex items-center gap-2 text-cyan-200 text-sm font-bold">
-                                <Ticket className="w-4 h-4" />
-                                <span>再挑戦の方法</span>
-                            </div>
-                            <p className="text-slate-300 text-sm leading-relaxed">
-                                レビュー投稿後、<span className="text-white font-bold">24時間以内</span>に3クレジット追加されるので、<br />
-                                再度同じ注文IDでチャレンジしてみてください◎
-                            </p>
-                        </div>
-                    </div>
+                    <ReviewPrompt />
                 </div>
             );
         }
@@ -90,6 +95,8 @@ export const ResultScreen = () => {
                             <p className="text-xs text-slate-500 mt-2">クリックしてコピー</p>
                         </div>
                     </div>
+
+                    <ReviewPrompt />
                 </div>
             );
         }
@@ -122,6 +129,8 @@ export const ResultScreen = () => {
                             <p className="text-xs text-slate-500 mt-2">クリックしてコピー</p>
                         </div>
                     </div>
+
+                    <ReviewPrompt />
                 </div>
             );
         }
