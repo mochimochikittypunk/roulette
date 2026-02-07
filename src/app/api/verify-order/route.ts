@@ -1,9 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+// Initialize Redis and Ratelimit
+const redis = new Redis({
+    url: process.env.KV_REST_API_URL || '',
+    token: process.env.KV_REST_API_TOKEN || '',
+});
+
+const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(5, '60 s'), // 5 requests per 60 seconds
+    analytics: true,
+    prefix: 'roulette-ratelimit',
+});
 
 export async function POST(req: NextRequest) {
     try {
+        // --- Rate Limiting ---
+        const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ??
+            req.headers.get('x-real-ip') ??
+            'unknown';
+
+        // Skip rate limiting if Redis is not configured (for local dev without credentials)
+        if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+            const { success, limit, remaining, reset } = await ratelimit.limit(ip);
+
+            if (!success) {
+                const retryAfterSeconds = Math.ceil((reset - Date.now()) / 1000);
+                return NextResponse.json(
+                    {
+                        allowed: false,
+                        error: `リクエストが多すぎます。${retryAfterSeconds}秒後に再度お試しください。`
+                    },
+                    {
+                        status: 429,
+                        headers: {
+                            'X-RateLimit-Limit': limit.toString(),
+                            'X-RateLimit-Remaining': remaining.toString(),
+                            'X-RateLimit-Reset': reset.toString(),
+                            'Retry-After': retryAfterSeconds.toString(),
+                        }
+                    }
+                );
+            }
+        }
+
         const { orderNumber } = await req.json();
 
         if (!orderNumber) {
