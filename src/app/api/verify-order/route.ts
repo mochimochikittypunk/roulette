@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({ allowed: true, remaining });
         } else {
-            return NextResponse.json({ allowed: false, error: '無効な注文IDです' });
+            return NextResponse.json({ allowed: false, error: '無効な注文IDです。発送通知メールを受信後に再度お試しください。' });
         }
 
     } catch (error) {
