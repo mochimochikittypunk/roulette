@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        const { orderNumber } = await req.json();
+        const { orderNumber, mode = 'ROULETTE' } = await req.json();
 
         if (!orderNumber) {
             return NextResponse.json({ allowed: false, error: '注文IDを入力してください' }, { status: 400 });
@@ -96,16 +96,32 @@ export async function POST(req: NextRequest) {
         });
 
         if (matchingRows.length > 0) {
-            // --- Success: Delete ONE Row ---
-            const targetRow = matchingRows[0];
-            await targetRow.delete();
+            if (mode === 'REVIEW') {
+                const count = matchingRows.length;
 
-            // Remaining count (excluding the one just deleted)
-            const remaining = matchingRows.length - 1;
+                // Delete all matching rows for REVIEW mode
+                // Deleting from bottom to top to prevent index shifting issues in the spreadsheet
+                for (let i = matchingRows.length - 1; i >= 0; i--) {
+                    await matchingRows[i].delete();
+                }
 
-            return NextResponse.json({ allowed: true, remaining });
+                return NextResponse.json({ allowed: true, count });
+            } else {
+                // ROULETTE mode (default behavior)
+                // --- Success: Delete ONE Row ---
+                const targetRow = matchingRows[0];
+                await targetRow.delete();
+
+                // Remaining count (excluding the one just deleted)
+                const remaining = matchingRows.length - 1;
+
+                return NextResponse.json({ allowed: true, remaining });
+            }
         } else {
-            return NextResponse.json({ allowed: false, error: '無効な注文IDです。発送通知メールを受信後に再度お試しください。' });
+            const errorMessage = mode === 'REVIEW'
+                ? '無効な注文IDです。レビュー後、24時間以内には適用されるはずなので、時間をおいて再度入力してみてください！'
+                : '無効な注文IDです。発送通知メールを受信後に再度お試しください。';
+            return NextResponse.json({ allowed: false, error: errorMessage });
         }
 
     } catch (error) {
